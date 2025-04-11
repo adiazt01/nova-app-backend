@@ -6,7 +6,9 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enums/user-role.enum';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
+
+
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -14,6 +16,10 @@ describe('UsersService', () => {
   let encryptionService: EncryptionsService;
 
   beforeEach(async () => {
+    // Unhabilitate the logger
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
+    
     const mockUserRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
@@ -116,8 +122,8 @@ describe('UsersService', () => {
 
     jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
 
+    
     await expect(service.create(newUser)).rejects.toThrow(BadRequestException);
-
     await expect(service.create(newUser)).rejects.toThrow('Email already exists');
 
     expect(userRepository.create).not.toHaveBeenCalled();
