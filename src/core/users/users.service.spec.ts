@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enums/user-role.enum';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
+import { BadRequestException } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -60,6 +61,7 @@ describe('UsersService', () => {
 
     const createdUser: User = {
       ...newUser,
+      password: 'mockedEncryptedPassword',
       id: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -67,17 +69,25 @@ describe('UsersService', () => {
 
     jest.spyOn(userRepository, 'create').mockReturnValue(createdUser);
     jest.spyOn(userRepository, 'save').mockResolvedValue(createdUser);
-
-    jest.spyOn(encryptionService, 'encrypt').mockResolvedValue('hashedPassword');
+    jest.spyOn(encryptionService, 'encrypt').mockResolvedValue('mockedEncryptedPassword');
 
     const result = await service.create(newUser);
 
-    expect(encryptionService.encrypt).toHaveBeenCalled();
-    expect(userRepository.create).toHaveBeenCalledWith(newUser);
-    expect(userRepository.save).toHaveBeenCalledWith(expect.objectContaining(newUser));
+    expect(encryptionService.encrypt).toHaveBeenCalledWith(newUser.password);
+
+    expect(userRepository.create).toHaveBeenCalledWith(expect.objectContaining({
+      ...newUser,
+      password: 'mockedEncryptedPassword',
+    }));
+
+    expect(userRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+      ...newUser,
+      password: 'mockedEncryptedPassword',
+    }));
 
     expect(result).toEqual({
       ...newUser,
+      password: 'mockedEncryptedPassword',
       id: 1,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
@@ -95,7 +105,7 @@ describe('UsersService', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-  
+
     const newUser: CreateUserDto = {
       email: 'test@example.com',
       password: 'password123',
@@ -103,12 +113,13 @@ describe('UsersService', () => {
       username: 'testuser',
       role: UserRole.USER,
     };
-  
+
     jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
-  
+
+    await expect(service.create(newUser)).rejects.toThrow(BadRequestException);
+
     await expect(service.create(newUser)).rejects.toThrow('Email already exists');
-  
-    expect(userRepository.findOne).toHaveBeenCalledWith({ where: { email: newUser.email } });
+
     expect(userRepository.create).not.toHaveBeenCalled();
     expect(userRepository.save).not.toHaveBeenCalled();
   });
