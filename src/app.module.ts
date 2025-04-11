@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import schemas from './config/schemas';
 import configurations from './config/configurations';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -26,10 +27,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         synchronize: true,
+        autoLoadEntities: true,
         type: 'postgres',
       }),
     }),
     CoreModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],

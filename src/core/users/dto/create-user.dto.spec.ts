@@ -1,0 +1,71 @@
+import { validate } from 'class-validator';
+import { CreateUserDto } from './create-user.dto';
+
+describe('CreateUser (DTO)', () => {
+  it('Should have all required properties', () => {
+    const dto = new CreateUserDto();
+
+    dto.username = 'testuser';
+    dto.fullName = 'Test User';
+    dto.email = 'armando@mail.com';
+    dto.password = 'Craft123*';
+
+    expect(dto).toHaveProperty('username');
+    expect(dto).toHaveProperty('fullName');
+    expect(dto).toHaveProperty('email');
+    expect(dto).toHaveProperty('password');
+    expect(dto).toHaveProperty('role');
+  });
+
+  it('Should validate the property with the correct password', async () => {
+    const dto = new CreateUserDto();
+
+    dto.username = 'testuser';
+    dto.fullName = 'Test User';
+    dto.email = 'armando@mail.com';
+    dto.password = 'craft123';
+
+    const errors = await validate(dto);
+    
+    expect(errors.length).toBe(1);
+    expect(errors[0].constraints).toHaveProperty('isStrongPassword');
+
+    dto.password = 'Craft123*';
+    const notErrors = await validate(dto);
+
+    expect(notErrors.length).toBe(0);
+    expect(notErrors).toEqual([]);
+  });
+
+  it('Should validate the property with the correct email', async () => {
+    const dto = new CreateUserDto();
+
+    dto.username = 'testuser';
+    dto.fullName = 'Test User';
+    dto.email = 'invalid-email';
+    dto.password = 'Craft123*';
+
+    const errors = await validate(dto);
+    
+    expect(errors.length).toBe(1);
+    expect(errors[0].constraints).toHaveProperty('isEmail');
+
+    dto.email = 'armando@mail.com';
+    const notErrors = await validate(dto);
+
+    expect(notErrors.length).toBe(0);
+    expect(notErrors).toEqual([]);
+  });
+
+  it('Should throw an error if a required property is missing', async () => {
+    const dto = new CreateUserDto();
+    
+
+    const errors = await validate(dto);
+    
+    expect(errors.length).toBe(4);
+    expect(errors[0].constraints).toHaveProperty('isNotEmpty');
+    expect(errors[1].constraints).toHaveProperty('isNotEmpty');
+    expect(errors[2].constraints).toHaveProperty('isNotEmpty');
+  });
+});
