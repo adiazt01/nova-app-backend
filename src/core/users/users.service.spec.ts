@@ -8,8 +8,6 @@ import { UserRole } from './enums/user-role.enum';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
 import { BadRequestException, Logger } from '@nestjs/common';
 
-
-
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: Repository<User>;
@@ -19,7 +17,7 @@ describe('UsersService', () => {
     // Unhabilitate the logger
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
-    
+
     const mockUserRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
@@ -128,5 +126,25 @@ describe('UsersService', () => {
 
     expect(userRepository.create).not.toHaveBeenCalled();
     expect(userRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should find a user by email', async () => {
+    const existingUser: User = {
+      id: 1,
+      email: 'test@example.com',
+      password: 'mockedEncryptedPassword',
+      fullName: 'Test User',
+      username: 'testuser',
+      role: UserRole.USER,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
+
+    const result = await service.findOneByEmail('test@example.com');
+
+    expect(userRepository.findOne).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
+    expect(result).toEqual(existingUser);
   });
 });

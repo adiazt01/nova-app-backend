@@ -1,33 +1,41 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interface/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
-  constructor (
+  constructor(
     private readonly usersService: UsersService,
-  ) {}
+    private readonly jwtService: JwtService,
+  ) { }
 
-  // async signUp(registerUserDto: RegisterUserDto) {
-  //   const { email } = registerUserDto;
-    
-  //   const existingUser = await this.usersService.findOneByEmail(
-  //     email
-  //   );
+  async signUp(registerUserDto: RegisterUserDto) {
+    const { email } = registerUserDto;
 
-  //   if (existingUser) {
-  //     throw new BadRequestException('User with this email already exists');
-  //   }
+    const existingUser = await this.usersService.findOneByEmail(
+      email
+    );
 
-  //   const newUser = await this.usersService.create(registerUserDto);
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists');
+    }
 
-  //   return {
-  //     ...newUser,
-  //     token: this.getJwtToken({
-  //       email: newUser.email,
-  //       id: newUser.id,
-  //       username: newUser.username,
-  //     }),
-  //   };
-  
+    const newUser = await this.usersService.create(registerUserDto);
+
+    return {
+      ...newUser,
+      token: this.generateJwt({
+        email: newUser.email,
+        id: newUser.id, 
+        username: newUser.username,
+        role: newUser.role,
+      }),
+    };
+  }
+
+  private generateJwt(payload: JwtPayload) {
+    return this.jwtService.sign(payload);
+  }
 }

@@ -21,7 +21,7 @@ export class UsersService {
     try {
       this.logger.log('Creating user', email);
 
-      const existingUser = await this.findByEmail(email);
+      const existingUser = await this.findOneByEmail(email);
 
       if (existingUser) throw new BadRequestException('Email already exists');
 
@@ -58,7 +58,7 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findOneByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({ where: { email } });
   }
 

@@ -19,7 +19,7 @@ describe('EncryptionsService', () => {
   it('should encrypt and decrypt a message', async () => {
     const message = 'Hello, World!';
     const encryptedMessage = await service.encrypt(message);
-    const decryptedMessage = await service.compare(encryptedMessage, message);
+    const decryptedMessage = await service.compare(message, encryptedMessage);
 
     expect(decryptedMessage).toBe(true);
   });
