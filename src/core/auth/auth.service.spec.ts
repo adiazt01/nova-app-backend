@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userService: UsersService;
+  let usersService: UsersService;
   let jwtService: JwtService;
 
   beforeEach(async () => {
@@ -35,7 +35,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userService = module.get<UsersService>(UsersService);
+    usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
   });
 
@@ -43,30 +43,41 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return a new user with a token when signUp is called', async () => {
+  it('should generate a JWT token with the correct payload', async () => {
     const dto: RegisterUserDto = {
       email: 'test@example.com',
       password: 'password123',
       fullName: 'Test User',
       username: 'testuser',
-      role: UserRole.USER
+      role: UserRole.USER,
     };
-
+  
     const createdUser = {
-      ...dto,
       id: 1,
-    }
-
-    jest.spyOn(service, 'signUp').mockResolvedValue(createdUser);
-
+      ...dto,
+      password: 'hashed-password-placeholder',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  
+    jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(null);
+    jest.spyOn(usersService, 'create').mockResolvedValue(createdUser);
+    jest.spyOn(jwtService, 'sign').mockReturnValue('mocked-jwt-token');
+  
     const result = await service.signUp(dto);
-
-    expect(userService.findOneByEmail).toHaveBeenCalledWith(dto.email);
-    expect(userService.create).toHaveBeenCalledWith(dto);
-    expect(jwtService.sign).toHaveBeenCalledWith({ id: createdUser.id, email: createdUser.email, username: createdUser.username, role: createdUser.role });
+  
+    expect(usersService.findOneByEmail).toHaveBeenCalledWith(dto.email);
+    expect(usersService.create).toHaveBeenCalledWith(dto);
+    expect(jwtService.sign).toHaveBeenCalledWith({
+      id: createdUser.id,
+      email: createdUser.email,
+      username: createdUser.username,
+      role: createdUser.role,
+    });
+  
     expect(result).toEqual({
       ...createdUser,
-      token: expect.any(String),
+      token: 'mocked-jwt-token',
     });
-  })
+  });
 });
