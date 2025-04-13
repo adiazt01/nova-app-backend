@@ -1,15 +1,18 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-
   @Post('signup')
+  @ApiOperation({
+    summary: 'Register a new user',
+    description: 'This endpoint allows a user to register with the system.',
+  })
   @ApiResponse({
     status: 201,
     description: 'User successfully registered',

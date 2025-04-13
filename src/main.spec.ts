@@ -9,6 +9,7 @@ jest.mock('@nestjs/core', () => {
         listen: jest.fn(),
         setGlobalPrefix: jest.fn(),
         useGlobalPipes: jest.fn(),
+        getHttpAdapter: jest.fn()
       }),
     }
   };

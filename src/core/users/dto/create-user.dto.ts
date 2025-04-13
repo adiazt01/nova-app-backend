@@ -9,23 +9,42 @@ import {
 import { UserRole } from 'src/core/users/enums/user-role.enum';
 
 export class CreateUserDto {
-  @ApiProperty()
+  @ApiProperty({
+    default: 'johndoe',
+    description: 'The username of the user',
+    example: 'johndoe',
+    required: true,
+  })
   @IsNotEmpty()
   @IsString()
   username: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    default: 'John Doe',
+    description: 'The full name of the user',
+    example: 'John Doe',
+    required: true,
+  })
   @IsNotEmpty()
   @IsString()
   fullName: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    default: 'user@example.com',
+    description: 'The email of the user',
+    example: 'user@example.com',
+    required: true,
+  })
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The password of the user',
+    default: 'StrongPassword123!',
+    required: true,
+  })
   @IsStrongPassword({
     minLength: 8,
     minLowercase: 1,
@@ -37,7 +56,12 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The role of the user',
+    example: UserRole.USER,
+    required: true,
+    enum: UserRole,
+  })
   @IsNotEmpty()
   @IsString()
   @IsEnum(UserRole)
