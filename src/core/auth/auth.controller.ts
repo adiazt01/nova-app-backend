@@ -1,12 +1,23 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+
   @Post('signup')
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request',
+  })
   signUp(@Body() registerUserDto: RegisterUserDto) {
     return this.authService.signUp(registerUserDto);
   }
