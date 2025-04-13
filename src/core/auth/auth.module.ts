@@ -8,9 +8,16 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersService } from '../users/users.service';;
 import { UsersModule } from '../users/users.module';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
+import { OtpService } from './otp/otp.service';
+import { OtpController } from './otp/otp.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Otp } from './otp/entities/otp.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([
+      Otp,
+    ]),
     UsersModule,
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -28,7 +35,7 @@ import { EncryptionsService } from 'src/common/services/encryptions/encryptions.
       }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UsersService, EncryptionsService],
+  controllers: [AuthController, OtpController],
+  providers: [AuthService, JwtStrategy, UsersService, EncryptionsService, OtpService],
 })
 export class AuthModule { }

@@ -5,6 +5,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { UserRole } from '../users/enums/user-role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
+import { User } from '../users/entities/user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -63,12 +64,13 @@ describe('AuthService', () => {
       role: UserRole.USER,
     };
   
-    const createdUser = {
+    const createdUser: User = {
       id: 1,
       ...dto,
       password: 'hashed-password-placeholder',
       createdAt: new Date(),
       updatedAt: new Date(),
+      otps: [],
     };
   
     jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(null);
@@ -101,12 +103,13 @@ describe('AuthService', () => {
       role: UserRole.USER,
     };
 
-    const userFound = {
+    const userFound: User = {
       id: 1,
       ...dto,
       password: 'hashed-password-placeholder',
       createdAt: new Date(),
       updatedAt: new Date(),
+      otps: [],
     }
 
     jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(userFound);

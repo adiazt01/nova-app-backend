@@ -1,6 +1,7 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
+import { Otp } from 'src/core/auth/otp/entities/otp.entity';
 
 @Entity({
   name: 'users',
@@ -42,4 +43,11 @@ export class User extends BaseEntity {
     nullable: false,
   })
   role: UserRole;
+
+  // Authentication fields
+  @OneToMany(() => Otp, (otp) => otp.user, {
+    cascade: true,
+    eager: true,
+  })
+  otps: Otp[];
 }

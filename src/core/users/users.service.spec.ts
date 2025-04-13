@@ -69,6 +69,7 @@ describe('UsersService', () => {
       id: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
+      otps: [],
     };
 
     jest.spyOn(userRepository, 'create').mockReturnValue(createdUser);
@@ -108,6 +109,7 @@ describe('UsersService', () => {
       role: UserRole.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
+      otps: [],
     };
 
     const newUser: CreateUserDto = {
@@ -138,6 +140,7 @@ describe('UsersService', () => {
       role: UserRole.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
+      otps: [],
     };
 
     jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);

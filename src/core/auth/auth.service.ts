@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Logger } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -8,6 +8,8 @@ import { EncryptionsService } from 'src/common/services/encryptions/encryptions.
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -17,29 +19,35 @@ export class AuthService {
   async signUp(registerUserDto: RegisterUserDto) {
     const { email } = registerUserDto;
 
-    const existingUser = await this.usersService.findOneByEmail(
-      email
-    );
+    try {
+      const existingUser = await this.usersService.findOneByEmail(email);
 
-    if (existingUser) {
-      throw new BadRequestException('User with this email already exists');
+      if (existingUser) {
+        throw new BadRequestException('User with this email already exists');
+      }
+
+      const newUser = await this.usersService.create(registerUserDto);
+
+      this.logger.log(`User created successfully: ${newUser.email}`);
+
+      return {
+        ...newUser,
+        token: this.generateJwt({
+          email: newUser.email,
+          id: newUser.id,
+          username: newUser.username,
+          role: newUser.role,
+        }),
+      };
+    } catch (error) {
+      this.logger.error('Error during sign-up', error.stack);
+      this.handleError(error);
     }
-
-    const newUser = await this.usersService.create(registerUserDto);
-
-    return {
-      ...newUser,
-      token: this.generateJwt({
-        email: newUser.email,
-        id: newUser.id,
-        username: newUser.username,
-        role: newUser.role,
-      }),
-    };
   }
 
   async signIn(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
+
     try {
       const userFound = await this.usersService.findOneByEmail(email);
 
@@ -56,6 +64,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      this.logger.log(`User signed in successfully: ${userFound.email}`);
+
       return {
         ...userFound,
         token: this.generateJwt({
@@ -66,7 +76,8 @@ export class AuthService {
         }),
       };
     } catch (error) {
-      throw new InternalServerErrorException('An error occurred while signing in');
+      this.logger.error('Error during sign-in', error.stack);
+      this.handleError(error);
     }
   }
 
@@ -75,14 +86,10 @@ export class AuthService {
   }
 
   private handleError(error: any) {
-    if (error instanceof BadRequestException) {
-      throw new BadRequestException(error.message);
+    if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+      throw error;
     }
 
-    if (error instanceof UnauthorizedException) {
-      throw new UnauthorizedException(error.message);
-    }
-
-    throw new BadRequestException('An error occurred');
+    throw new InternalServerErrorException('An unexpected error occurred');
   }
 }
