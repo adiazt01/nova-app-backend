@@ -54,6 +54,7 @@ describe('AuthController', () => {
       fullName: 'Test User',
       role: UserRole.USER,
       username: 'testuser',
+      bio: 'This is a test bio',
     } 
     
     const signUpSpy = jest.spyOn(controller, 'signUp');

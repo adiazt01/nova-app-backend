@@ -2,6 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -25,10 +26,10 @@ export class AuthController {
     return this.authService.signUp(registerUserDto);
   }
 
-  // @Post('signin')
-  // signIn(@Body() loginUserDto: LoginUserDto) {
-  //   return this.authService.signIn(loginUserDto);
-  // }
+  @Post('signin')
+  signIn(@Body() loginUserDto: LoginUserDto) {
+    return this.authService.signIn(loginUserDto);
+  }
 
   // @Post('refresh')
   // refresh(@Body() refreshTokenDto: RefreshTokenDto) {

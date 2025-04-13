@@ -5,10 +5,14 @@ import schemas from './config/schemas';
 import configurations from './config/configurations';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
+import { PostsModule } from './posts/posts.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Global()
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: schemas(),
@@ -34,6 +38,8 @@ import { CommonModule } from './common/common.module';
     }),
     CoreModule,
     CommonModule,
+    PostsModule,
+    ProfilesModule,
   ],
   controllers: [],
   providers: [],

@@ -17,15 +17,8 @@ export class AuthService {
   ) { }
 
   async signUp(registerUserDto: RegisterUserDto) {
-    const { email } = registerUserDto;
-
     try {
-      const existingUser = await this.usersService.findOneByEmail(email);
-
-      if (existingUser) {
-        throw new BadRequestException('User with this email already exists');
-      }
-
+      console.log(registerUserDto)
       const newUser = await this.usersService.create(registerUserDto);
 
       this.logger.log(`User created successfully: ${newUser.email}`);
@@ -35,7 +28,6 @@ export class AuthService {
         token: this.generateJwt({
           email: newUser.email,
           id: newUser.id,
-          username: newUser.username,
           role: newUser.role,
         }),
       };
@@ -71,7 +63,6 @@ export class AuthService {
         token: this.generateJwt({
           email: userFound.email,
           id: userFound.id,
-          username: userFound.username,
           role: userFound.role,
         }),
       };

@@ -3,8 +3,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
+import { ProfilesService } from 'src/profiles/profiles.service';
+import { Profile } from 'src/profiles/entities/profile.entity';
 
 @Injectable()
 export class UsersService {
@@ -13,41 +15,49 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly encryptionsService: EncryptionsService,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const { email, fullName, password, role, username } = createUserDto;
-    
-    try {
-      this.logger.log('Creating user', email);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const { email, fullName, password, role, bio, username } = createUserDto;
 
-      const existingUser = await this.findOneByEmail(email);
+    console.log(createUserDto);
 
-      if (existingUser) throw new BadRequestException('Email already exists');
+    return await this.dataSource.transaction(async (manager) => {
+      try {
+        this.logger.log('Creating user', email);
 
-      const hashedPassword = await this.encryptionsService.encrypt(password);
+        const existingUser = await manager.findOne(User, { where: { email } });
 
-      const newUser = this.userRepository.create({
-        email,
-        fullName,
-        password: hashedPassword,
-        role,
-        username,
-      });
+        if (existingUser) throw new BadRequestException('Email already exists');
 
-      const savedUser = await this.userRepository.save(newUser);
-      
-      return savedUser;
-    } catch (error) {
-      this.logger.error(`Error creating user with email ${email}`, error);
+        const hashedPassword = await this.encryptionsService.encrypt(password);
 
-      if (error instanceof BadRequestException) {
-        throw error;
+        const newUser = manager.create(User, {
+          email,
+          fullName,
+          password: hashedPassword,
+          role,
+        });
+        const savedUser = await manager.save(newUser);
+
+        const newProfile = manager.create(Profile, {
+          username,
+          bio,
+          user: savedUser,
+        });
+
+        await manager.save(newProfile);
+
+        return savedUser;
+      } catch (error) {
+        this.logger.error(`Error creating user with email ${email}`, error);
+        
+        throw error instanceof BadRequestException
+          ? error
+          : new InternalServerErrorException('An unexpected error occurred while creating the user');
       }
-
-      this.logger.error('Error creating user', error);
-      throw new InternalServerErrorException('An unexpected error occurred while creating the user');
-    }
+    });
   }
 
   findAll() {

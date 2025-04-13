@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEnum,
@@ -7,18 +7,9 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 import { UserRole } from 'src/core/users/enums/user-role.enum';
+import { CreateProfileDto } from 'src/profiles/dto/create-profile.dto';
 
-export class CreateUserDto {
-  @ApiProperty({
-    default: 'johndoe',
-    description: 'The username of the user',
-    example: 'johndoe',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  username: string;
-
+export class CreateUserPropertiesDto {
   @ApiProperty({
     default: 'John Doe',
     description: 'The full name of the user',
@@ -67,3 +58,5 @@ export class CreateUserDto {
   @IsEnum(UserRole)
   role: UserRole = UserRole.USER;
 }
+
+export class CreateUserDto extends IntersectionType(CreateUserPropertiesDto, CreateProfileDto) {}

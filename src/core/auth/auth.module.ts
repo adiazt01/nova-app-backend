@@ -30,7 +30,7 @@ import { Otp } from './otp/entities/otp.entity';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get('JWT_EXPIRATION_TIME'),
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
         },
       }),
     }),
