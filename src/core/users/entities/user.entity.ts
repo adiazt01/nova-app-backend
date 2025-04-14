@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { UserRole } from '../enums/user-role.enum';
 import { Otp } from 'src/core/auth/otp/entities/otp.entity';
 import { Profile } from 'src/profiles/entities/profile.entity';
+import { Post } from 'src/posts/entities/post.entity';
 
 @Entity({
   name: 'users',
@@ -27,6 +28,7 @@ export class User extends BaseEntity {
   @Column({
     type: 'text',
     nullable: false,
+    select: false,
   })
   password: string;
 
@@ -35,21 +37,27 @@ export class User extends BaseEntity {
     enum: UserRole,
     default: UserRole.USER,
     nullable: false,
+    select: false,
   })
   role: UserRole;
+
+  // Feed
+  @OneToMany(() => Post, (post) => post.user, {
+    onDelete: 'CASCADE',
+  })
+  posts?: Post[];
 
   // Authentication fields
   @OneToMany(() => Otp, (otp) => otp.user, {
     cascade: true,
-    eager: true,
   })
   otps?: Otp[];
 
   // Profile fields
   @OneToOne(() => Profile, (profile) => profile.user, {
     cascade: true,
-    eager: true,
     nullable: true,
+    eager: true,
   })
   profile?: Profile;
 }

@@ -8,6 +8,8 @@ import { CommonModule } from './common/common.module';
 import { PostsModule } from './posts/posts.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { StoriesModule } from './stories/stories.module';
+import { FeedsModule } from './feeds/feeds.module';
 
 @Global()
 @Module({
@@ -40,6 +42,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CommonModule,
     PostsModule,
     ProfilesModule,
+    StoriesModule,
+    FeedsModule,
   ],
   controllers: [],
   providers: [],

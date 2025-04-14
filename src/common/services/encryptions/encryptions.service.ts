@@ -11,6 +11,8 @@ export class EncryptionsService {
     }
 
     async compare(data: string, hashed: string): Promise<boolean> {
+        console.log('Comparing data:', data);
+        console.log('Hashed data:', hashed);
         return await bcrypt.compare(data, hashed);
     }
 }

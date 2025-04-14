@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
-import { ProfilesService } from 'src/profiles/profiles.service';
 import { Profile } from 'src/profiles/entities/profile.entity';
 
 @Injectable()
@@ -20,8 +19,6 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, fullName, password, role, bio, username } = createUserDto;
-
-    console.log(createUserDto);
 
     return await this.dataSource.transaction(async (manager) => {
       try {
@@ -69,7 +66,7 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({ where: { email }, select: { id: true, email: true, password: true, role: true } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

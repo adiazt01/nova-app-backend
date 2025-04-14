@@ -27,6 +27,18 @@ export class AuthController {
   }
 
   @Post('signin')
+  @ApiOperation({
+    summary: 'User login',
+    description: 'This endpoint allows a user to log in to the system.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully logged in',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request'
+  })
   signIn(@Body() loginUserDto: LoginUserDto) {
     return this.authService.signIn(loginUserDto);
   }
