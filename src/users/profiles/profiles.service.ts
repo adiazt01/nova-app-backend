@@ -7,27 +7,32 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class ProfilesService {
   private readonly logger = new Logger(ProfilesService.name);
-  
-  constructor (
+
+  constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
-  
+  ) { }
+
   findAll() {
     return `This action returns all profiles`;
   }
 
   async findOne(id: string): Promise<Profile> {
     try {
-     const profileFound = await this.profileRepository.findOne({
-       where: { id },
-     });    
+      const profileFound = await this.profileRepository.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          user: true,
+        }
+      });
 
-     if (!profileFound) {
-       throw new NotFoundException('Profile not found');
-     }
+      if (!profileFound) {
+        throw new NotFoundException('Profile not found');
+      }
 
-     return profileFound;
+      return profileFound;
     } catch (error) {
       this.logger.error('Error fetching profile', error);
 
@@ -42,13 +47,13 @@ export class ProfilesService {
     }
   }
 
-  async update(id: string, updateProfileDto: UpdateProfileDto) {
+  async update(id: number, updateProfileDto: UpdateProfileDto) {
     try {
-      await this.findOne(id);
+      const profileFound = await this.findOneByUserId(id);
 
       const profileUpdated = await this.profileRepository.save({
         ...updateProfileDto,
-        id,
+        id: profileFound.id,
       });
 
       this.logger.log(`Profile updated successfully: ${profileUpdated.id}`);
@@ -70,5 +75,34 @@ export class ProfilesService {
 
   remove(id: number) {
     return `This action removes a #${id} profile`;
+  }
+
+  private async findOneByUserId(userId: number): Promise<Profile> {
+    try {
+      const profileFound = await this.profileRepository.findOne({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      });
+
+      if (!profileFound) {
+        throw new NotFoundException('Profile not found');
+      }
+
+      return profileFound
+    } catch (error) {
+      this.logger.error('Error fetching profile by user ID', error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Error fetching profile by user ID',
+        error,
+      );
+    }
   }
 }
