@@ -9,7 +9,7 @@ export class CreateProfileDto {
   })
   @IsOptional()
   @IsString()
-  bio: string;
+  bio?: string;
 
   @ApiProperty({
     description: 'The username of the user ',

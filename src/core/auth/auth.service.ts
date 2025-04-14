@@ -24,10 +24,9 @@ export class AuthService {
 
   async signUp(registerUserDto: RegisterUserDto) {
     try {
-      console.log(registerUserDto);
       const newUser = await this.usersService.create(registerUserDto);
 
-      this.logger.log(`User created successfully: ${newUser.email}`);
+      this.logger.log(`User created successfully: ${newUser}`);
 
       return {
         ...newUser,

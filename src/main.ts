@@ -6,7 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const swagger = new DocumentBuilder()
+  const config = new DocumentBuilder()
     .setTitle('Nova API')
     .setDescription('Nova API description')
     .setVersion('1.0')
@@ -14,7 +14,7 @@ export async function bootstrap() {
     .addTag('nova')
     .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, swagger);
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
   app.setGlobalPrefix('api');

@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { UsersService } from 'src/core/users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/core/users/entities/user.entity';
-import { UserRole } from 'src/core/users/enums/user-role.enum';
+import { UserRole } from 'src/users/enums/user-role.enum';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 jest.mock('src/core/users/users.service');
 
@@ -13,7 +13,11 @@ describe('JwtStrategy', () => {
   let mockConfigService: jest.Mocked<ConfigService>;
 
   beforeEach(() => {
-    mockUsersService = new UsersService({} as any, {} as any);
+    mockUsersService = {
+        findOneByEmail: jest.fn(),
+        create: jest.fn(),
+    } as unknown as jest.Mocked<UsersService>;
+
     mockConfigService = {
       get: jest.fn().mockReturnValue('test-secret'),
     } as unknown as jest.Mocked<ConfigService>;

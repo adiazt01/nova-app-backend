@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enums/user-role.enum';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
@@ -12,6 +12,7 @@ describe('UsersService', () => {
   let service: UsersService;
   let userRepository: Repository<User>;
   let encryptionService: EncryptionsService;
+  let dataSource: DataSource;
 
   beforeEach(async () => {
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
@@ -24,6 +25,12 @@ describe('UsersService', () => {
       update: jest.fn(),
       remove: jest.fn(),
       save: jest.fn(),
+    };
+
+    const mockDataSource = {  
+      transaction: jest.fn().mockImplementation((callback) => {
+        return callback(mockUserRepository);
+      }),
     };
 
     const mockEncryptionService = {
@@ -40,6 +47,10 @@ describe('UsersService', () => {
         {
           provide: EncryptionsService,
           useValue: mockEncryptionService,
+        },
+        {
+          provide: DataSource,
+          useValue: mockDataSource,
         },
         UsersService,
       ],

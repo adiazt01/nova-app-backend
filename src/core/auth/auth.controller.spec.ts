@@ -6,11 +6,21 @@ import { EncryptionsService } from 'src/common/services/encryptions/encryptions.
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { UserRole } from 'src/users/enums/user-role.enum';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('AuthController', () => {
   let controller: AuthController;
+  let userRepository: jest.Mocked<Repository<User>>;
 
   beforeEach(async () => {
+    const mockUserRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+      findOne: jest.fn(),
+    };
+
     const mockUsersService = {
       findOneByEmail: jest.fn(),
       create: jest.fn(),
@@ -29,6 +39,10 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         AuthService,
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository,
+        },
         {
           provide: UsersService,
           useValue: mockUsersService,

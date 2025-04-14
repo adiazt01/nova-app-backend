@@ -41,6 +41,7 @@ export class UsersService {
           password: hashedPassword,
           role,
         });
+        console.log(newUser);
         const savedUser = await manager.save(newUser);
 
         const newProfile = manager.create(Profile, {

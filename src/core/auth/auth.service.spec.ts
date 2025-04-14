@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UserRole } from '../users/enums/user-role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
-import { User } from '../users/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
+import { UserRole } from 'src/users/enums/user-role.enum';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -62,6 +62,7 @@ describe('AuthService', () => {
       fullName: 'Test User',
       username: 'testuser',
       role: UserRole.USER,
+      bio: '',
     };
 
     const createdUser: User = {
@@ -79,12 +80,11 @@ describe('AuthService', () => {
 
     const result = await service.signUp(dto);
 
-    expect(usersService.findOneByEmail).toHaveBeenCalledWith(dto.email);
     expect(usersService.create).toHaveBeenCalledWith(dto);
     expect(jwtService.sign).toHaveBeenCalledWith({
       id: createdUser.id,
       email: createdUser.email,
-      username: createdUser.username,
+      username: createdUser.profile?.username,
       role: createdUser.role,
     });
 
@@ -101,6 +101,7 @@ describe('AuthService', () => {
       fullName: 'Test User',
       username: 'testuser',
       role: UserRole.USER,
+      bio: 'This is a test bio',
     };
 
     const userFound: User = {
@@ -126,7 +127,7 @@ describe('AuthService', () => {
     expect(jwtService.sign).toHaveBeenCalledWith({
       id: userFound.id,
       email: userFound.email,
-      username: userFound.username,
+      username: userFound.profile?.username,
       role: userFound.role,
     });
 
