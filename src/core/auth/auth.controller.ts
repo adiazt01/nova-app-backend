@@ -37,7 +37,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request'
+    description: 'Bad request',
   })
   signIn(@Body() loginUserDto: LoginUserDto) {
     return this.authService.signIn(loginUserDto);
@@ -63,7 +63,6 @@ export class AuthController {
   //   return this.authService.resetPassword(resetPasswordDto);
   // }
 
-
   // @Post('verify-email')
   // verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
   //   return this.authService.verifyEmail(verifyEmailDto);
@@ -79,7 +78,7 @@ export class AuthController {
   //   return this.authService.logoutAll(logoutAllDto);
   // }
 
-  // @Post('validate-otp')  
+  // @Post('validate-otp')
   // validateOtp(@Body() validateOtpDto: ValidateOtpDto) {
   //   return this.authService.validateOtp(validateOtpDto);
   // }

@@ -26,7 +26,7 @@ describe('RegisterUser (DTO)', () => {
     dto.password = 'craft123';
 
     const errors = await validate(dto);
-    
+
     expect(errors.length).toBe(1);
     expect(errors[0].constraints).toHaveProperty('isStrongPassword');
 
@@ -46,7 +46,7 @@ describe('RegisterUser (DTO)', () => {
     dto.password = 'Craft123*';
 
     const errors = await validate(dto);
-    
+
     expect(errors.length).toBe(1);
     expect(errors[0].constraints).toHaveProperty('isEmail');
 
@@ -59,10 +59,9 @@ describe('RegisterUser (DTO)', () => {
 
   it('Should throw an error if a required property is missing', async () => {
     const dto = new RegisterUserDto();
-    
 
     const errors = await validate(dto);
-    
+
     expect(errors.length).toBe(4);
     expect(errors[0].constraints).toHaveProperty('isNotEmpty');
     expect(errors[1].constraints).toHaveProperty('isNotEmpty');

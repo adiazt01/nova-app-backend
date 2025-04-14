@@ -32,14 +32,15 @@ describe('UsersService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [{
-        provide: getRepositoryToken(User),
-        useValue: mockUserRepository,
-      },
-      {
-        provide: EncryptionsService,
-        useValue: mockEncryptionService,
-      },
+      providers: [
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository,
+        },
+        {
+          provide: EncryptionsService,
+          useValue: mockEncryptionService,
+        },
         UsersService,
       ],
     }).compile();
@@ -73,21 +74,27 @@ describe('UsersService', () => {
 
     jest.spyOn(userRepository, 'create').mockReturnValue(createdUser);
     jest.spyOn(userRepository, 'save').mockResolvedValue(createdUser);
-    jest.spyOn(encryptionService, 'encrypt').mockResolvedValue('mockedEncryptedPassword');
+    jest
+      .spyOn(encryptionService, 'encrypt')
+      .mockResolvedValue('mockedEncryptedPassword');
 
     const result = await service.create(newUser);
 
     expect(encryptionService.encrypt).toHaveBeenCalledWith(newUser.password);
 
-    expect(userRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-      ...newUser,
-      password: 'mockedEncryptedPassword',
-    }));
+    expect(userRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...newUser,
+        password: 'mockedEncryptedPassword',
+      }),
+    );
 
-    expect(userRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-      ...newUser,
-      password: 'mockedEncryptedPassword',
-    }));
+    expect(userRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...newUser,
+        password: 'mockedEncryptedPassword',
+      }),
+    );
 
     expect(result).toEqual({
       ...newUser,
@@ -120,9 +127,10 @@ describe('UsersService', () => {
 
     jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
 
-    
     await expect(service.create(newUser)).rejects.toThrow(BadRequestException);
-    await expect(service.create(newUser)).rejects.toThrow('Email already exists');
+    await expect(service.create(newUser)).rejects.toThrow(
+      'Email already exists',
+    );
 
     expect(userRepository.create).not.toHaveBeenCalled();
     expect(userRepository.save).not.toHaveBeenCalled();
@@ -133,7 +141,7 @@ describe('UsersService', () => {
       id: 1,
       email: 'test@example.com',
       password: 'mockedEncryptedPassword',
-      fullName: 'Test User',      
+      fullName: 'Test User',
       role: UserRole.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -143,7 +151,9 @@ describe('UsersService', () => {
 
     const result = await service.findOneByEmail('test@example.com');
 
-    expect(userRepository.findOne).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
+    expect(userRepository.findOne).toHaveBeenCalledWith({
+      where: { email: 'test@example.com' },
+    });
     expect(result).toEqual(existingUser);
   });
 });

@@ -5,19 +5,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { UsersService } from '../users/users.service';;
-import { UsersModule } from '../users/users.module';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
 import { OtpService } from './otp/otp.service';
 import { OtpController } from './otp/otp.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Otp } from './otp/entities/otp.entity';
+import { UsersModule } from 'src/users/users.module';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Otp,
-    ]),
+    TypeOrmModule.forFeature([Otp]),
     UsersModule,
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -36,6 +34,12 @@ import { Otp } from './otp/entities/otp.entity';
     }),
   ],
   controllers: [AuthController, OtpController],
-  providers: [AuthService, JwtStrategy, UsersService, EncryptionsService, OtpService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    UsersService,
+    EncryptionsService,
+    OtpService,
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}

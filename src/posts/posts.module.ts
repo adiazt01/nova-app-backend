@@ -6,12 +6,7 @@ import { Post } from './entities/post.entity';
 import { Hashtag } from './entities/hashtag.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Post,
-      Hashtag,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Post, Hashtag])],
   controllers: [PostsController],
   providers: [PostsService],
 })

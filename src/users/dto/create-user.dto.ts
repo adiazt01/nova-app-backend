@@ -6,8 +6,8 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { UserRole } from 'src/core/users/enums/user-role.enum';
-import { CreateProfileDto } from 'src/profiles/dto/create-profile.dto';
+import { CreateProfileDto } from 'src/users/profiles/dto/create-profile.dto';
+import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserPropertiesDto {
   @ApiProperty({
@@ -59,4 +59,7 @@ export class CreateUserPropertiesDto {
   role: UserRole = UserRole.USER;
 }
 
-export class CreateUserDto extends IntersectionType(CreateUserPropertiesDto, CreateProfileDto) {}
+export class CreateUserDto extends IntersectionType(
+  CreateUserPropertiesDto,
+  CreateProfileDto,
+) {}

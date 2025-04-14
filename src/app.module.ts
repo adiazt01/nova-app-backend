@@ -6,10 +6,11 @@ import configurations from './config/configurations';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
 import { PostsModule } from './posts/posts.module';
-import { ProfilesModule } from './profiles/profiles.module';
+import { ProfilesModule } from './users/profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { StoriesModule } from './stories/stories.module';
 import { FeedsModule } from './feeds/feeds.module';
+import { FilesModule } from './files/files.module';
 
 @Global()
 @Module({
@@ -44,11 +45,10 @@ import { FeedsModule } from './feeds/feeds.module';
     ProfilesModule,
     StoriesModule,
     FeedsModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
-  exports: [
-    TypeOrmModule
-  ]
+  exports: [TypeOrmModule],
 })
 export class AppModule {}

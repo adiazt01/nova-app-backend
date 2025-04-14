@@ -1,10 +1,16 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interface/jwt-payload.interface';
 import { LoginUserDto } from './dto/login-user.dto';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +20,11 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly encryptionsService: EncryptionsService,
-  ) { }
+  ) {}
 
   async signUp(registerUserDto: RegisterUserDto) {
     try {
-      console.log(registerUserDto)
+      console.log(registerUserDto);
       const newUser = await this.usersService.create(registerUserDto);
 
       this.logger.log(`User created successfully: ${newUser.email}`);
@@ -72,14 +78,15 @@ export class AuthService {
     }
   }
 
-  
-
   private generateJwt(payload: JwtPayload) {
     return this.jwtService.sign(payload);
   }
 
   private handleError(error: any) {
-    if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+    if (
+      error instanceof BadRequestException ||
+      error instanceof UnauthorizedException
+    ) {
       throw error;
     }
 

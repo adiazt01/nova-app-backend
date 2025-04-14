@@ -1,16 +1,21 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { EncryptionsService } from 'src/common/services/encryptions/encryptions.service';
-import { Profile } from 'src/profiles/entities/profile.entity';
+import { Profile } from 'src/users/profiles/entities/profile.entity';
 
 @Injectable()
 export class UsersService {
   private logger = new Logger(UsersService.name);
-  constructor (
+  constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly encryptionsService: EncryptionsService,
@@ -49,10 +54,12 @@ export class UsersService {
         return savedUser;
       } catch (error) {
         this.logger.error(`Error creating user with email ${email}`, error);
-        
+
         throw error instanceof BadRequestException
           ? error
-          : new InternalServerErrorException('An unexpected error occurred while creating the user');
+          : new InternalServerErrorException(
+              'An unexpected error occurred while creating the user',
+            );
       }
     });
   }
@@ -66,7 +73,10 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { email }, select: { id: true, email: true, password: true, role: true } });
+    return await this.userRepository.findOne({
+      where: { email },
+      select: { id: true, email: true, password: true, role: true },
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

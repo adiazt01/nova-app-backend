@@ -1,5 +1,4 @@
-import { OmitType, IntersectionType, PickType } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/core/users/dto/create-user.dto';
+import { IntersectionType } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
-export class RegisterUserDto extends IntersectionType(CreateUserDto, ) {
-}
+export class RegisterUserDto extends IntersectionType(CreateUserDto) {}

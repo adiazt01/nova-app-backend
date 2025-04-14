@@ -1,6 +1,6 @@
-import { NestFactory } from "@nestjs/core";
-import { bootstrap } from "./main";
-import { ValidationPipe } from "@nestjs/common";
+import { NestFactory } from '@nestjs/core';
+import { bootstrap } from './main';
+import { ValidationPipe } from '@nestjs/common';
 
 jest.mock('@nestjs/core', () => {
   return {
@@ -9,9 +9,9 @@ jest.mock('@nestjs/core', () => {
         listen: jest.fn(),
         setGlobalPrefix: jest.fn(),
         useGlobalPipes: jest.fn(),
-        getHttpAdapter: jest.fn()
+        getHttpAdapter: jest.fn(),
       }),
-    }
+    },
   };
 });
 
@@ -24,7 +24,6 @@ describe('Main bootstrap (root)', () => {
     };
 
     (NestFactory.create as jest.Mock).mockResolvedValue(mockApp);
-
 
     await bootstrap();
 

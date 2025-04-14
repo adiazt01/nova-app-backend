@@ -17,11 +17,11 @@ describe('AuthService', () => {
     const mockUsersService = {
       create: jest.fn(),
       findOneByEmail: jest.fn(),
-    }
+    };
 
     const mockJwtService = {
       sign: jest.fn(),
-    }
+    };
 
     const mockEncryptionsService = {
       compare: jest.fn(),
@@ -41,7 +41,7 @@ describe('AuthService', () => {
         {
           provide: EncryptionsService,
           useValue: mockEncryptionsService,
-        }
+        },
       ],
     }).compile();
 
@@ -63,7 +63,7 @@ describe('AuthService', () => {
       username: 'testuser',
       role: UserRole.USER,
     };
-  
+
     const createdUser: User = {
       id: 1,
       ...dto,
@@ -72,13 +72,13 @@ describe('AuthService', () => {
       updatedAt: new Date(),
       otps: [],
     };
-  
+
     jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(null);
     jest.spyOn(usersService, 'create').mockResolvedValue(createdUser);
     jest.spyOn(jwtService, 'sign').mockReturnValue('mocked-jwt-token');
-  
+
     const result = await service.signUp(dto);
-  
+
     expect(usersService.findOneByEmail).toHaveBeenCalledWith(dto.email);
     expect(usersService.create).toHaveBeenCalledWith(dto);
     expect(jwtService.sign).toHaveBeenCalledWith({
@@ -87,7 +87,7 @@ describe('AuthService', () => {
       username: createdUser.username,
       role: createdUser.role,
     });
-  
+
     expect(result).toEqual({
       ...createdUser,
       token: 'mocked-jwt-token',
@@ -110,7 +110,7 @@ describe('AuthService', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       otps: [],
-    }
+    };
 
     jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(userFound);
     jest.spyOn(encryptionsService, 'compare').mockResolvedValue(true);
@@ -119,7 +119,10 @@ describe('AuthService', () => {
     const result = await service.signIn(dto);
 
     expect(usersService.findOneByEmail).toHaveBeenCalledWith(dto.email);
-    expect(encryptionsService.compare).toHaveBeenCalledWith(dto.password, userFound.password);
+    expect(encryptionsService.compare).toHaveBeenCalledWith(
+      dto.password,
+      userFound.password,
+    );
     expect(jwtService.sign).toHaveBeenCalledWith({
       id: userFound.id,
       email: userFound.email,
@@ -131,5 +134,5 @@ describe('AuthService', () => {
       ...userFound,
       token: 'mocked-jwt-token',
     });
-  })
+  });
 });
