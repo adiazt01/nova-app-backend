@@ -15,7 +15,6 @@ export class CreateProfileDto {
     description: 'The username of the user ',
     default: 'johndoe',
     required: true,
-    uniqueItems: true,
   })
   @IsString()
   username: string;

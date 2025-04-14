@@ -1,23 +1,71 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProfileDto } from './dto/create-profile.dto';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Profile } from './entities/profile.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfilesService {
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
-  }
-
+  private readonly logger = new Logger(ProfilesService.name);
+  
+  constructor (
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
+  ) {}
+  
   findAll() {
     return `This action returns all profiles`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async findOne(id: string): Promise<Profile> {
+    try {
+     const profileFound = await this.profileRepository.findOne({
+       where: { id },
+     });    
+
+     if (!profileFound) {
+       throw new NotFoundException('Profile not found');
+     }
+
+     return profileFound;
+    } catch (error) {
+      this.logger.error('Error fetching profile', error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Error fetching profile',
+        error,
+      );
+    }
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(id: string, updateProfileDto: UpdateProfileDto) {
+    try {
+      await this.findOne(id);
+
+      const profileUpdated = await this.profileRepository.save({
+        ...updateProfileDto,
+        id,
+      });
+
+      this.logger.log(`Profile updated successfully: ${profileUpdated.id}`);
+
+      return profileUpdated;
+    } catch (error) {
+      this.logger.error('Error updating profile', error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Error updating profile',
+        error,
+      );
+    }
   }
 
   remove(id: number) {

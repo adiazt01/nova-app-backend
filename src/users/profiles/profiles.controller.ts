@@ -6,37 +6,35 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
-import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Auth } from 'src/core/auth/decorators/auth/auth.decorator';
 
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
-
-  @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profilesService.create(createProfileDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.profilesService.findAll();
-  }
+  // TODO: Business logic for view
+  // @Get()
+  // findAll() {
+  //   return this.profilesService.findAll();
+  // }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profilesService.findOne(+id);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.profilesService.findOne(id);
   }
 
+  @Auth()
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profilesService.update(+id, updateProfileDto);
+  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.profilesService.update(id, updateProfileDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profilesService.remove(+id);
-  }
+  // @Auth()
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.profilesService.remove(+id);
+  // }
 }
