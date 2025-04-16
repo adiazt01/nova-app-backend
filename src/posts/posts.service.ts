@@ -154,7 +154,32 @@ export class PostsService {
     }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    try {
+      const postToDelete = await this.postsRepository.findOne({
+        where: { id },
+      });
+
+      if (!postToDelete) {
+        throw new NotFoundException(`Post with ID ${id} not found`);
+      }
+
+      await this.postsRepository.remove(postToDelete);
+
+      this.logger.log(`Post with ID ${id} deleted successfully`);
+      
+      return postToDelete;
+    } catch (error) {
+      this.logger.error(`An error occurred while deleting the post with ID ${id}`, error.stack);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        `An error occurred while deleting the post`,
+        error.stack,
+      )
+    }
   }
 }

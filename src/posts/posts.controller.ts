@@ -80,6 +80,16 @@ export class PostsController {
     return this.postsService.update(id, updatePostDto);
   }
 
+  @Auth()
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete a post', 
+    description: 'This endpoint allows you to delete a post by its ID.',
+  })
+  @ApiOkResponse({
+    description: 'Post deleted successfully',
+    type: CreatePostDto,
+  })
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.postsService.remove(id);
