@@ -13,15 +13,17 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Auth } from 'src/core/auth/decorators/auth/auth.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PaginationOptionsDto } from 'src/common/dto/paginations/pagination-options.dto';
+import { PaginationDto } from 'src/common/dto/paginations/pagination.dto';
+import { PaginationMetadataDto } from 'src/common/dto/paginations/pagination-meta.dto';
 
 @ApiTags('posts')
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @Auth()
   @Post()
@@ -34,6 +36,10 @@ export class PostsController {
     description: 'Post created successfully',
     type: CreatePostDto,
   })
+  @ApiBody({
+    type: CreatePostDto,
+    description: 'Post data',
+  })
   create(@Body() createPostDto: CreatePostDto, @GetUser('id', new ParseIntPipe()) userId: number) {
     return this.postsService.create(createPostDto, userId);
   }
@@ -45,7 +51,7 @@ export class PostsController {
   })
   @ApiOkResponse({
     description: 'Posts retrieved successfully',
-    type: [CreatePostDto],
+    type: PaginationDto,
   })
   findAll(@Query() paginationOptionsDto: PaginationOptionsDto) {
     return this.postsService.findAll(paginationOptionsDto);
@@ -69,7 +75,7 @@ export class PostsController {
   @Auth()
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Update a post', 
+    summary: 'Update a post',
     description: 'This endpoint allows you to update a post by its ID.',
   })
   @ApiOkResponse({
@@ -83,7 +89,7 @@ export class PostsController {
   @Auth()
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Delete a post', 
+    summary: 'Delete a post',
     description: 'This endpoint allows you to delete a post by its ID.',
   })
   @ApiOkResponse({

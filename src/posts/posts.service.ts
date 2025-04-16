@@ -111,7 +111,7 @@ export class PostsService {
     }
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto) {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     try {
       const { description, hashtags, title } = updatePostDto;
 
@@ -150,7 +150,16 @@ export class PostsService {
       this.logger.log(`Post with ID ${id} updated successfully`);
       return updatedPost;
     } catch (error) {
+      this.logger.error(`An error occurred while updating the post with ID ${id}`, error.stack);
 
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        `An error occurred while updating the post`,
+        error.stack,
+      );
     }
   }
 
