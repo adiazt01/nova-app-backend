@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/core/auth/decorators/auth/auth.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { PaginationOptionsDto } from 'src/common/dto/paginations/pagination-options.dto';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -23,6 +26,10 @@ export class PostsController {
   @Auth()
   @Post()
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create a new post',
+    description: 'This endpoint allows you to create a new post.',
+  })
   @ApiCreatedResponse({
     description: 'Post created successfully',
     type: CreatePostDto,
@@ -32,22 +39,49 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  @ApiOperation({
+    summary: 'Get all posts',
+    description: 'This endpoint allows you to retrieve all posts.',
+  })
+  @ApiOkResponse({
+    description: 'Posts retrieved successfully',
+    type: [CreatePostDto],
+  })
+  findAll(@Query() paginationOptionsDto: PaginationOptionsDto) {
+    return this.postsService.findAll(paginationOptionsDto);
   }
 
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  @ApiOperation({
+    summary: 'Get post by ID',
+    description: 'This endpoint allows you to retrieve a post by its ID.',
+  })
+  @ApiOkResponse({
+    description: 'Post retrieved successfully',
+    type: CreatePostDto,
+  })
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.postsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @Auth()
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update a post', 
+    description: 'This endpoint allows you to update a post by its ID.',
+  })
+  @ApiOkResponse({
+    description: 'Post updated successfully',
+    type: UpdatePostDto,
+  })
+  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.postsService.remove(id);
   }
 }

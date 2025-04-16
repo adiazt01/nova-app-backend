@@ -28,7 +28,7 @@ export class AuthController {
 
   @Post('signin')
   @ApiOperation({
-    summary: 'User login',
+    summary: 'Login a user',
     description: 'This endpoint allows a user to log in to the system.',
   })
   @ApiResponse({

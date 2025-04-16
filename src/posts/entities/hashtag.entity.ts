@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from './post.entity';
 
 @Entity({
@@ -19,4 +19,9 @@ export class Hashtag extends BaseEntity {
 
   @ManyToMany(() => Post, (post) => post.hashtags)
   posts: Post[];
+
+  @BeforeInsert()
+  async normalizeName() {
+    this.name = this.name.toLowerCase().trim().replace(/^#/, '');
+  }
 }

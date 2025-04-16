@@ -1,10 +1,13 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { Hashtag } from './entities/hashtag.entity';
+import { PaginationOptionsDto } from 'src/common/dto/paginations/pagination-options.dto';
+import { PaginationDto } from 'src/common/dto/paginations/pagination.dto';
+import { paginate } from 'src/common/helpers/pagination.helper';
 
 @Injectable()
 export class PostsService {
@@ -26,13 +29,13 @@ export class PostsService {
       });
 
       const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
-      const newHashtagNames = hashtags.filter(
+      const newHashtagNames = (hashtags ?? []).filter(
         (name) => !existingHashtagNames.includes(name),
       );
 
       const newHashtags = this.hashtagRepository.create(
         newHashtagNames.map((name) => ({ name })),
-      );      
+      );
 
       await this.hashtagRepository.save(newHashtags);
 
@@ -58,19 +61,100 @@ export class PostsService {
     }
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll(paginationOptionsDto: PaginationOptionsDto): Promise<PaginationDto<Post>> {
+    try {
+      const queryBuilder = this.postsRepository.createQueryBuilder('post');
+
+      queryBuilder.innerJoinAndSelect('post.user', 'user');
+      queryBuilder.innerJoinAndSelect('user.profile', 'profile');
+      queryBuilder.innerJoinAndSelect('post.hashtags', 'hashtags');
+
+      return await paginate(queryBuilder, paginationOptionsDto);
+    } catch (error) {
+      this.logger.error(`An error ocurred while fetching posts`, error.stack)
+
+      throw new InternalServerErrorException(
+        `An error occurred while fetching posts`,
+        error.stack,
+      )
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: string): Promise<Post> {
+    try {
+      const postFound = await this.postsRepository.findOne({
+        where: { id },
+        relations: {
+          user: {
+            profile: true,
+          },
+          hashtags: true,
+        },
+      });
+
+      if (!postFound) {
+        throw new NotFoundException(`Post with ID ${id} not found`);
+      }
+
+      return postFound;
+    } catch (error) {
+      this.logger.error(`An error occurred while fetching the post with ID ${id}`, error.stack);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        `An error occurred while fetching the post`,
+        error.stack,
+      )
+    }
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    try {
+      const { description, hashtags, title } = updatePostDto;
+
+      await this.findOne(id);
+
+      const postToUpdate = await this.postsRepository.preload({
+        id,
+        description,
+        title,
+      });
+
+      if (!postToUpdate) {
+        throw new NotFoundException(`Post with ID ${id} not found`);
+      }
+
+      if (hashtags) {
+        const existingHashtags = await this.hashtagRepository.find({
+          where: hashtags.map((name) => ({ name })),
+        });
+
+        const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
+
+        const newHashtagNames = hashtags.filter(
+          (name) => !existingHashtagNames.includes(name),
+        );
+        const newHashtags = this.hashtagRepository.create(
+          newHashtagNames.map((name) => ({ name })),
+        );
+        await this.hashtagRepository.save(newHashtags);
+
+        const allHashtags = [...existingHashtags, ...newHashtags];
+        postToUpdate.hashtags = allHashtags;
+      }
+
+      const updatedPost = await this.postsRepository.save(postToUpdate);
+      this.logger.log(`Post with ID ${id} updated successfully`);
+      return updatedPost;
+    } catch (error) {
+
+    }
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} post`;
   }
 }

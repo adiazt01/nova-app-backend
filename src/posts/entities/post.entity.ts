@@ -2,6 +2,7 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import {
 	Column,
 	Entity,
+	JoinTable,
 	ManyToMany,
 	ManyToOne,
 	OneToMany,
@@ -33,6 +34,7 @@ export class Post extends BaseEntity {
 	title: string;
 
 	@ManyToMany(() => Hashtag, (hashtag) => hashtag.posts)
+	@JoinTable()
 	hashtags: Hashtag[];
 
 	@ManyToOne(() => User, (user) => user.posts, {
