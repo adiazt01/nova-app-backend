@@ -2,7 +2,7 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import {
   Column,
   Entity,
-  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -10,7 +10,8 @@ import {
 import { UserRole } from '../enums/user-role.enum';
 import { Otp } from 'src/core/auth/otp/entities/otp.entity';
 import { Profile } from 'src/users/profiles/entities/profile.entity';
-import { Post } from 'src/content/posts/entities/post.entity';
+import { Post } from 'src/contents/posts/entities/post.entity';
+import { Comment } from 'src/contents/comments/entities/comment.entity';
 
 @Entity({
   name: 'users',
@@ -48,11 +49,16 @@ export class User extends BaseEntity {
   })
   role: UserRole;
 
-  // Feed
+  // Contents
   @OneToMany(() => Post, (post) => post.user, {
     onDelete: 'CASCADE',
   })
   posts?: Post[];
+
+  @OneToMany(() => Comment, (comment) => comment.user, {
+    cascade: true,
+  })
+  comments?: Comment[];
 
   // Authentication fields
   @OneToMany(() => Otp, (otp) => otp.user, {

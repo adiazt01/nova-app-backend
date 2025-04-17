@@ -9,7 +9,7 @@ import { ProfilesModule } from './users/profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { FeedsModule } from './feeds/feeds.module';
 import { FilesModule } from './files/files.module';
-import { ContentModule } from './content/content.module';
+import { ContentModule } from './contents/content.module';
 
 @Global()
 @Module({
