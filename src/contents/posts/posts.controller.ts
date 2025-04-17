@@ -18,7 +18,6 @@ import { Auth } from 'src/core/auth/decorators/auth/auth.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PaginationOptionsDto } from 'src/common/dto/paginations/pagination-options.dto';
 import { PaginationDto } from 'src/common/dto/paginations/pagination.dto';
-import { PaginationMetadataDto } from 'src/common/dto/paginations/pagination-meta.dto';
 
 @ApiTags('posts')
 @Controller('posts')

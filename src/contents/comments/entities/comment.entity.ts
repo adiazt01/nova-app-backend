@@ -1,6 +1,7 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TargetEntity } from '../enums/target-entity.enum';
 
 @Entity({ name: 'comments' })
 export class Comment extends BaseEntity {
@@ -11,10 +12,10 @@ export class Comment extends BaseEntity {
   content: string;
 
   @Column({ type: 'uuid', nullable: false })
-  targetId: string; // ID de la publicación o historia asociada
+  targetId: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  targetType: string; // Tipo de publicación (por ejemplo, 'Post', 'Story')
+  @Column({ type: 'enum', enum: TargetEntity, nullable: false })
+  targetType: TargetEntity;
 
   @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
   user: User;
