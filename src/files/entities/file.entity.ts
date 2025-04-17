@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Post } from 'src/posts/entities/post.entity';
-import { Story } from 'src/stories/entities/story.entity';
+import { Post } from 'src/content/posts/entities/post.entity';
+import { Story } from 'src/content/stories/entities/story.entity';
 import {
   Column,
   Entity,

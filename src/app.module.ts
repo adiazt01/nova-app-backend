@@ -5,12 +5,11 @@ import schemas from './config/schemas';
 import configurations from './config/configurations';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
-import { PostsModule } from './posts/posts.module';
 import { ProfilesModule } from './users/profiles/profiles.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { StoriesModule } from './stories/stories.module';
 import { FeedsModule } from './feeds/feeds.module';
 import { FilesModule } from './files/files.module';
+import { ContentModule } from './content/content.module';
 
 @Global()
 @Module({
@@ -41,11 +40,10 @@ import { FilesModule } from './files/files.module';
     }),
     CoreModule,
     CommonModule,
-    PostsModule,
     ProfilesModule,
-    StoriesModule,
     FeedsModule,
     FilesModule,
+    ContentModule,
   ],
   controllers: [],
   providers: [],

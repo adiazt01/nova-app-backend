@@ -10,7 +10,7 @@ import {
 import { UserRole } from '../enums/user-role.enum';
 import { Otp } from 'src/core/auth/otp/entities/otp.entity';
 import { Profile } from 'src/users/profiles/entities/profile.entity';
-import { Post } from 'src/posts/entities/post.entity';
+import { Post } from 'src/content/posts/entities/post.entity';
 
 @Entity({
   name: 'users',
