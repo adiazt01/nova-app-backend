@@ -3,7 +3,7 @@ import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Auth } from 'src/core/auth/decorators/auth/auth.decorator';
 import { TargetCommentDto } from './dto/target-comment.dto';
 
@@ -36,6 +36,13 @@ export class CommentsController {
   @ApiOperation({
     summary: 'Get a comment by ID',
     description: 'Retrieves a specific comment by its ID.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The UUID of the comment',
+    type: 'string',
+    format: 'uuid',
+    required: true,
   })
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
