@@ -4,6 +4,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { TargetReactionDto } from '../reactions/dto/target-reaction.dto';
 import { TargetCommentDto } from './dto/target-comment.dto';
 
 @Injectable()

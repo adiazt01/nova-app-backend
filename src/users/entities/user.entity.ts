@@ -2,7 +2,6 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import {
   Column,
   Entity,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -12,6 +11,7 @@ import { Otp } from 'src/core/auth/otp/entities/otp.entity';
 import { Profile } from 'src/users/profiles/entities/profile.entity';
 import { Post } from 'src/contents/posts/entities/post.entity';
 import { Comment } from 'src/contents/comments/entities/comment.entity';
+import { Reaction } from 'src/contents/reactions/entities/reaction.entity';
 
 @Entity({
   name: 'users',
@@ -49,7 +49,6 @@ export class User extends BaseEntity {
   })
   role: UserRole;
 
-  // Contents
   @OneToMany(() => Post, (post) => post.user, {
     onDelete: 'CASCADE',
   })
@@ -60,17 +59,23 @@ export class User extends BaseEntity {
   })
   comments?: Comment[];
 
-  // Authentication fields
   @OneToMany(() => Otp, (otp) => otp.user, {
     cascade: true,
   })
   otps?: Otp[];
 
-  // Profile fields
   @OneToOne(() => Profile, (profile) => profile.user, {
     cascade: true,
     nullable: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   profile?: Profile;
+
+  @OneToMany(() => Reaction, (reactions) => reactions.user, {
+    cascade: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  reactions?: Reaction[];
 }

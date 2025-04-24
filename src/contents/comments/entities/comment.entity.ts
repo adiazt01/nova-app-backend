@@ -1,7 +1,8 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { TargetEntity } from '../enums/target-entity.enum';
+import { TargetEntity } from '../../../common/enums/target-entity.enum';
+import { Reaction } from 'src/contents/reactions/entities/reaction.entity';
 
 @Entity({ name: 'comments' })
 export class Comment extends BaseEntity {
@@ -21,8 +22,8 @@ export class Comment extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true, onDelete: 'CASCADE' })
-  parent: Comment; // Comentario padre (si es una respuesta)
+  parent: Comment;
 
   @OneToMany(() => Comment, (comment) => comment.parent)
-  replies: Comment[]; // Respuestas a este comentario
+  replies: Comment[];
 }

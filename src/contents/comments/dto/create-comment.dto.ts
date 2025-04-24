@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
-import { TargetEntity } from "../enums/target-entity.enum";
+import { TargetEntity } from "../../../common/enums/target-entity.enum";
 
 export class CreateCommentDto {
     @ApiProperty({
