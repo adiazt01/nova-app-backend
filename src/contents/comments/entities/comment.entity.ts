@@ -2,7 +2,6 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TargetEntity } from '../../../common/enums/target-entity.enum';
-import { Reaction } from 'src/contents/reactions/entities/reaction.entity';
 
 @Entity({ name: 'comments' })
 export class Comment extends BaseEntity {

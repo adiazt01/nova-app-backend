@@ -30,7 +30,10 @@ export async function bootstrap() {
   );
 
   app.enableCors({
-    origin: 'http://localhost:5173', // Permitir solicitudes desde este origen
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ], // Permitir solicitudes desde este origen
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
     credentials: true, // Permitir cookies o credenciales
   });

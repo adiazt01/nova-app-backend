@@ -4,7 +4,9 @@ import { StoriesModule } from './stories/stories.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReactionsModule } from './reactions/reactions.module';
 
+
 @Module({
-    imports: [PostsModule, StoriesModule, CommentsModule, ReactionsModule]
+    imports: [PostsModule, StoriesModule, CommentsModule, ReactionsModule],
+    controllers: []
 })
 export class ContentModule {}

@@ -3,6 +3,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ProfilesService {
@@ -75,6 +76,33 @@ export class ProfilesService {
 
   remove(id: number) {
     return `This action removes a #${id} profile`;
+  }
+
+  async findOneByTerm(term: string): Promise<Profile> {
+    try {
+      const profileFound = await this.profileRepository.findOne({
+        where: {
+          id: isUUID(term) ? term : undefined,
+          username: !isUUID(term) ? term : undefined,
+        },
+        relations: {
+          user: true,
+        }
+      });
+      if (!profileFound) {
+        throw new NotFoundException('Profile not found');
+      }
+      return profileFound;
+    } catch (error) {
+      this.logger.error('Error fetching profile by term', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Error fetching profile by term',
+        error,
+      );
+    }
   }
 
   private async findOneByUserId(userId: number): Promise<Profile> {
