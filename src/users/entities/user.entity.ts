@@ -12,6 +12,7 @@ import { Profile } from 'src/users/profiles/entities/profile.entity';
 import { Post } from 'src/contents/posts/entities/post.entity';
 import { Comment } from 'src/contents/comments/entities/comment.entity';
 import { Reaction } from 'src/contents/reactions/entities/reaction.entity';
+import { RefreshToken } from 'src/core/auth/entities/refresh-token.entity';
 
 @Entity({
   name: 'users',
@@ -59,10 +60,17 @@ export class User extends BaseEntity {
   })
   comments?: Comment[];
 
+  // Auth fields
   @OneToMany(() => Otp, (otp) => otp.user, {
     cascade: true,
   })
   otps?: Otp[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  refreshTokens?: RefreshToken[];
 
   @OneToOne(() => Profile, (profile) => profile.user, {
     cascade: true,

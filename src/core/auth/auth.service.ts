@@ -20,7 +20,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly encryptionsService: EncryptionsService,
-  ) {}
+  ) { }
 
   async signUp(registerUserDto: RegisterUserDto) {
     try {

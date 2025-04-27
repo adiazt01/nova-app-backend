@@ -5,7 +5,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -42,11 +42,6 @@ export class AuthController {
   signIn(@Body() loginUserDto: LoginUserDto) {
     return this.authService.signIn(loginUserDto);
   }
-
-  // @Post('refresh')
-  // refresh(@Body() refreshTokenDto: RefreshTokenDto) {
-  //   return this.authService.refresh(refreshTokenDto);
-  // }
 
   // @Post('logout')
   // logout(@Body() logoutDto: LogoutDto) {
