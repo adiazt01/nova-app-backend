@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Post } from 'src/contents/posts/entities/post.entity';
+import { MediaPost } from 'src/contents/posts/entities/posts/post-media.entity';
+import { Post } from 'src/contents/posts/entities/posts/post.entity';
 import { Story } from 'src/contents/stories/entities/story.entity';
 import {
   Column,
@@ -35,6 +36,6 @@ export class File extends BaseEntity {
   @OneToOne(() => Story, (story) => story.file)
   story?: Story;
 
-  @ManyToOne(() => Post, (post) => post.files, { onDelete: 'CASCADE' })
-  post?: Post;
+  @ManyToOne(() => MediaPost, (post) => post.mediaFiles, { onDelete: 'CASCADE' })
+  post?: MediaPost;
 }

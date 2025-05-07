@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, Logger, NotFoundException } f
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
+import { Post } from './entities/posts/post.entity';
 import { Repository } from 'typeorm';
 import { Hashtag } from './entities/hashtag.entity';
 import { PaginationOptionsDto } from 'src/common/dto/paginations/pagination-options.dto';
@@ -21,44 +21,44 @@ export class PostsService {
   ) { }
 
   async create(createPostDto: CreatePostDto, userId: number) {
-    const { description, hashtags, title } = createPostDto;
+    // const { description, hashtags, title } = createPostDto;
 
-    try {
-      const existingHashtags = await this.hashtagRepository.find({
-        where: hashtags.map((name) => ({ name })),
-      });
+    // try {
+    //   const existingHashtags = await this.hashtagRepository.find({
+    //     where: hashtags.map((name) => ({ name })),
+    //   });
 
-      const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
-      const newHashtagNames = (hashtags ?? []).filter(
-        (name) => !existingHashtagNames.includes(name),
-      );
+    //   const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
+    //   const newHashtagNames = (hashtags ?? []).filter(
+    //     (name) => !existingHashtagNames.includes(name),
+    //   );
 
-      const newHashtags = this.hashtagRepository.create(
-        newHashtagNames.map((name) => ({ name })),
-      );
+    //   const newHashtags = this.hashtagRepository.create(
+    //     newHashtagNames.map((name) => ({ name })),
+    //   );
 
-      await this.hashtagRepository.save(newHashtags);
+    //   await this.hashtagRepository.save(newHashtags);
 
-      const allHashtags = [...existingHashtags, ...newHashtags];
+    //   const allHashtags = [...existingHashtags, ...newHashtags];
 
-      const newPost = this.postsRepository.create({
-        description,
-        title,
-        hashtags: allHashtags,
-        user: { id: userId }
-      })
+    //   const newPost = this.postsRepository.create({
+    //     description,
+    //     title,
+    //     hashtags: allHashtags,
+    //     user: { id: userId }
+    //   })
 
-      const savedPost = await this.postsRepository.save(newPost);
+    //   const savedPost = await this.postsRepository.save(newPost);
 
-      this.logger.log(`Post created with ID: ${savedPost.id}`)
+    //   this.logger.log(`Post created with ID: ${savedPost.id}`)
 
-      return savedPost;
-    } catch (error) {
-      this.logger.error('Error creating a post', error.stack)
-      throw new InternalServerErrorException(
-        'An error occurred while creating the post',
-      );
-    }
+    //   return savedPost;
+    // } catch (error) {
+    //   this.logger.error('Error creating a post', error.stack)
+    //   throw new InternalServerErrorException(
+    //     'An error occurred while creating the post',
+    //   );
+    // }
   }
 
   async findAll(paginationOptionsDto: PaginationOptionsDto): Promise<PaginationDto<Post>> {
@@ -111,56 +111,56 @@ export class PostsService {
     }
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
-    try {
-      const { description, hashtags, title } = updatePostDto;
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    // try {
+    //   const { description, hashtags, title } = updatePostDto;
 
-      await this.findOne(id);
+    //   await this.findOne(id);
 
-      const postToUpdate = await this.postsRepository.preload({
-        id,
-        description,
-        title,
-      });
+    //   const postToUpdate = await this.postsRepository.preload({
+    //     id,
+    //     description,
+    //     title,
+    //   });
 
-      if (!postToUpdate) {
-        throw new NotFoundException(`Post with ID ${id} not found`);
-      }
+    //   if (!postToUpdate) {
+    //     throw new NotFoundException(`Post with ID ${id} not found`);
+    //   }
 
-      if (hashtags) {
-        const existingHashtags = await this.hashtagRepository.find({
-          where: hashtags.map((name) => ({ name })),
-        });
+    //   if (hashtags) {
+    //     const existingHashtags = await this.hashtagRepository.find({
+    //       where: hashtags.map((name) => ({ name })),
+    //     });
 
-        const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
+    //     const existingHashtagNames = existingHashtags.map((hashtag) => hashtag.name);
 
-        const newHashtagNames = hashtags.filter(
-          (name) => !existingHashtagNames.includes(name),
-        );
-        const newHashtags = this.hashtagRepository.create(
-          newHashtagNames.map((name) => ({ name })),
-        );
-        await this.hashtagRepository.save(newHashtags);
+    //     const newHashtagNames = hashtags.filter(
+    //       (name) => !existingHashtagNames.includes(name),
+    //     );
+    //     const newHashtags = this.hashtagRepository.create(
+    //       newHashtagNames.map((name) => ({ name })),
+    //     );
+    //     await this.hashtagRepository.save(newHashtags);
 
-        const allHashtags = [...existingHashtags, ...newHashtags];
-        postToUpdate.hashtags = allHashtags;
-      }
+    //     const allHashtags = [...existingHashtags, ...newHashtags];
+    //     postToUpdate.hashtags = allHashtags;
+    //   }
 
-      const updatedPost = await this.postsRepository.save(postToUpdate);
-      this.logger.log(`Post with ID ${id} updated successfully`);
-      return updatedPost;
-    } catch (error) {
-      this.logger.error(`An error occurred while updating the post with ID ${id}`, error.stack);
+    //   const updatedPost = await this.postsRepository.save(postToUpdate);
+    //   this.logger.log(`Post with ID ${id} updated successfully`);
+    //   return updatedPost;
+    // } catch (error) {
+    //   this.logger.error(`An error occurred while updating the post with ID ${id}`, error.stack);
 
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
+    //   if (error instanceof NotFoundException) {
+    //     throw error;
+    //   }
 
-      throw new InternalServerErrorException(
-        `An error occurred while updating the post`,
-        error.stack,
-      );
-    }
+    //   throw new InternalServerErrorException(
+    //     `An error occurred while updating the post`,
+    //     error.stack,
+    //   );
+    // }
   }
 
   async remove(id: string) {

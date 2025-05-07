@@ -26,10 +26,12 @@ export class AuthService {
     try {
       const newUser = await this.usersService.create(registerUserDto);
 
+      const { password: newUserPassword, ...newUserWithoutPassword } = newUser;
+
       this.logger.log(`User created successfully: ${newUser}`);
 
       return {
-        ...newUser,
+        ...newUserWithoutPassword,
         token: this.generateJwt({
           email: newUser.email,
           id: newUser.id,
@@ -47,7 +49,7 @@ export class AuthService {
 
     try {
       const userFound = await this.usersService.findOneByEmail(email);
-
+      console.log(userFound);
       if (!userFound) {
         throw new UnauthorizedException('Invalid credentials');
       }
@@ -63,8 +65,10 @@ export class AuthService {
 
       this.logger.log(`User signed in successfully: ${userFound.email}`);
 
+      const { password: userFoundPassword, ...userWithoutPassword } = userFound;
+
       return {
-        ...userFound,
+        ...userWithoutPassword,
         token: this.generateJwt({
           email: userFound.email,
           id: userFound.id,

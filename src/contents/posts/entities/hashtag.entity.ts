@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { BeforeInsert, Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Post } from './post.entity';
+import { Post } from './posts/post.entity';
 
 @Entity({
   name: 'hashtags',

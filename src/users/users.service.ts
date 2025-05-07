@@ -21,13 +21,12 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
     private readonly encryptionsService: EncryptionsService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, fullName, password, role, bio, username } = createUserDto;
-
-    return await this.dataSource.transaction(async (manager) => {
-      try {
+    try {
+      const newUser = await this.dataSource.transaction(async (manager) => {
         this.logger.log('Creating user', email);
 
         const existingUser = await manager.findOne(User, { where: { email } });
@@ -42,7 +41,7 @@ export class UsersService {
           password: hashedPassword,
           role,
         });
-        console.log(newUser);
+
         const savedUser = await manager.save(newUser);
 
         const newProfile = manager.create(Profile, {
@@ -54,16 +53,24 @@ export class UsersService {
         await manager.save(newProfile);
 
         return savedUser;
-      } catch (error) {
-        this.logger.error(`Error creating user with email ${email}`, error);
+      });
 
-        throw error instanceof BadRequestException
-          ? error
-          : new InternalServerErrorException(
-              'An unexpected error occurred while creating the user',
-            );
+      const user = await this.findOne(newUser.id);
+
+      if (!user) {
+        throw new InternalServerErrorException('User creation failed');
       }
-    });
+      
+      return user;
+    } catch (error) {
+      this.logger.error(`Error creating user with email ${createUserDto.email}`, error);
+
+      throw error instanceof BadRequestException
+        ? error
+        : new InternalServerErrorException(
+          'An unexpected error occurred while creating the user',
+        );
+    }
   }
 
   findAll() {
@@ -74,7 +81,7 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({
         where: { id },
-        select: { id: true, email: true, password: true, role: true },
+        select: { id: true, email: true, password: true, role: true, profile: { id: true, username: true } },
       });
 
       if (!user) throw new NotFoundException('User not found');
@@ -87,15 +94,15 @@ export class UsersService {
       throw error instanceof BadRequestException
         ? error
         : new InternalServerErrorException(
-            'An unexpected error occurred while finding the user',
-          );
+          'An unexpected error occurred while finding the user',
+        );
     }
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { email },
-      select: { id: true, email: true, password: true, role: true },
+      select: { id: true, email: true, password: true, role: true, profile: { id: true, username: true } },
     });
   }
 

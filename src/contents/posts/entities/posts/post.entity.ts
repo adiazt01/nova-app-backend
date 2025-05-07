@@ -5,33 +5,25 @@ import {
 	JoinTable,
 	ManyToMany,
 	ManyToOne,
-	OneToMany,
 	PrimaryGeneratedColumn,
+	TableInheritance,
 } from 'typeorm';
-import { Hashtag } from './hashtag.entity';
-import { File } from 'src/files/entities/file.entity';
+import { Hashtag } from '../hashtag.entity';
 import { User } from 'src/users/entities/user.entity';
+import { PostKind } from '../../enum/post-kind.enum';
 
 @Entity({
 	name: 'posts',
 })
+@TableInheritance({
+	column: {
+		type: 'enum',
+		enum: PostKind,
+	},
+})
 export class Post extends BaseEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
-
-	@Column({
-		type: 'varchar',
-		length: 255,
-		nullable: true,
-	})
-	description: string;
-
-	@Column({
-		type: 'varchar',
-		length: 255,
-		nullable: false,
-	})
-	title: string;
 
 	@ManyToMany(() => Hashtag, (hashtag) => hashtag.posts)
 	@JoinTable()
@@ -41,7 +33,4 @@ export class Post extends BaseEntity {
 		cascade: true,
 	})
 	user: User;
-
-	@OneToMany(() => File, (file) => file.post, { cascade: true })
-	files: File[];
 }
